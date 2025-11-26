@@ -1,0 +1,44 @@
+name: Stardew Valley Mod CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '6.0.x' ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Install Dependencies
+      run: dotnet restore --source https://api.nuget.org/v3/index.json
+
+    - name: Build Mod
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Verify Build
+      run: |
+        if [ -f "ConvenientInventory/bin/Release/ConvenientInventory.dll" ]; then
+          echo "✅ Build successful! DLL found at bin/Release/"
+        else
+          echo "❌ Build failed! DLL not found"
+          exit 1
+        fi
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: convenient-inventory-build
+        path: ConvenientInventory/bin/Release/
