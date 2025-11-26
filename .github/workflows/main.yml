@@ -38,7 +38,7 @@ jobs:
         fi
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # ✅ 已修复：从 v3 升级到 v4
       with:
         name: convenient-inventory-build
         path: ConvenientInventory/bin/Release/
